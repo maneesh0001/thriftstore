@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../addproduct/addproduct.dart';
+import '../paymentview/payment.dart';
+import '../profileview/profile.dart';
+import '../searchview/search.dart';
+import '../dashboardview/buyproduct.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -9,6 +15,14 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    const DashboardContent(),
+    const Addproduct(),
+    const Search(),
+    const Payment(),
+    const Profile(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -29,127 +43,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
         },
         items: [
           BottomNavigationBarItem(
-            icon: Image.asset('assets/icons/home.png', width: 24, height: 24),
-            label: '',
+            icon: Image.asset('assets/icons/home.png', width: 30, height: 30),
+            label: 'home',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset('assets/icons/add.png', width: 24, height: 24),
-            label: '',
+            icon: Image.asset('assets/icons/add.png', width: 30, height: 30),
+            label: 'add',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset('assets/icons/search.png', width: 24, height: 24),
-            label: '',
+            icon: Image.asset('assets/icons/search.png', width: 30, height: 30),
+            label: 'search',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset('assets/icons/heart.png', width: 24, height: 24),
-            label: '',
+            icon: Image.asset('assets/icons/order.png', width: 30, height: 30),
+            label: 'order',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset('assets/icons/user.png', width: 24, height: 24),
-            label: '',
+            icon: Image.asset(
+              'assets/icons/profile.png',
+              width: 30,
+              height: 30,
+            ),
+            label: 'profile',
           ),
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'F2K',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'STORE',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Banner
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    'assets/images/fas.jpg',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Recently added title
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  "Recently added",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              // Recently added items
-              SizedBox(
-                height: 110,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  children: [
-                    buildCardItem('assets/images/2ele.jpg'),
-                    buildCardItem('assets/images/mbl.jpg'),
-                    buildCardItem('assets/images/3tshp.jpg'),
-                    buildCardItem('assets/images/wat.jpg'),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Grid Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    buildGridItem('assets/images/tsh.jpg'),
-                    const SizedBox(width: 16),
-                    buildGridItem('assets/images/lap.jpg', showSeeAll: true),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
-      ),
+      body: SafeArea(child: _screens[_currentIndex]),
     );
   }
+}
 
-  // Widget for horizontal card items
+class DashboardContent extends StatelessWidget {
+  const DashboardContent({super.key});
+
   Widget buildCardItem(String imagePath) {
     return Padding(
       padding: const EdgeInsets.only(right: 12),
@@ -165,7 +91,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Widget for grid items with optional 'See all'
   Widget buildGridItem(String imagePath, {bool showSeeAll = false}) {
     return Expanded(
       child: Stack(
@@ -174,22 +99,93 @@ class _DashboardScreenState extends State<DashboardScreen> {
             borderRadius: BorderRadius.circular(12),
             child: Image.asset(imagePath, height: 200, fit: BoxFit.cover),
           ),
-          if (showSeeAll)
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  'See all',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Text(
+              'F2K Store',
+              style: GoogleFonts.openSans(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
+          ),
+
+          // Clickable Banner
+          Padding(
+            padding: const EdgeInsets.only(left: 55),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BuyProduct()),
+                );
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset('assets/images/fas.jpg', fit: BoxFit.cover),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Recently added
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "Recently added",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          SizedBox(
+            height: 110,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                buildCardItem('assets/images/2ele.jpg'),
+                buildCardItem('assets/images/mbl.jpg'),
+                buildCardItem('assets/images/3tshp.jpg'),
+                buildCardItem('assets/images/wat.jpg'),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                buildGridItem('assets/images/tsh.jpg'),
+                const SizedBox(width: 16),
+                buildGridItem('assets/images/lap.jpg'),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 30),
         ],
       ),
     );
