@@ -5,6 +5,6 @@ class Addproduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: Colors.blue);
+    return Container(color: const Color.fromARGB(255, 77, 166, 239));
   }
 }
