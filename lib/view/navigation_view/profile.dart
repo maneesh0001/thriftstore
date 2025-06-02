@@ -5,6 +5,6 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: Colors.pink);
+    return Container(color: const Color.fromARGB(255, 220, 42, 101));
   }
 }
