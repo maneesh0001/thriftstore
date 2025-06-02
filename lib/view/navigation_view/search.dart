@@ -5,6 +5,6 @@ class Search extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: Colors.yellow);
+    return Container(color: const Color.fromARGB(255, 229, 211, 49));
   }
 }
