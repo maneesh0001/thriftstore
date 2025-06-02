@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../addproduct/addproduct.dart';
-import '../paymentview/payment.dart';
-import '../profileview/profile.dart';
-import '../searchview/search.dart';
+import '../navigation_view/addproduct.dart';
+import '../navigation_view/payment.dart';
+import '../navigation_view/profile.dart';
+import '../navigation_view/search.dart';
 import '../dashboardview/buyproduct.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -115,7 +115,7 @@ class DashboardContent extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Text(
               'F2K Store',
-              style: GoogleFonts.openSans(
+              style: GoogleFonts.montserrat(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
