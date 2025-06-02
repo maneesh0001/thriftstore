@@ -79,7 +79,7 @@ class BuyProduct extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
+            backgroundColor: const Color.fromARGB(255, 239, 62, 50),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
