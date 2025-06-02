@@ -5,6 +5,6 @@ class Payment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: Colors.red);
+    return Container(color: const Color.fromARGB(255, 224, 55, 43));
   }
 }
