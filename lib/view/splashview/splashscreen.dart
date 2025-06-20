@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import '../loginview/login_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:thrift_store/app/service_locator/service_locator.dart';
+import 'package:thrift_store/features/auth/presentation/view/login_page.dart';
+import 'package:thrift_store/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -50,7 +53,11 @@ class _SplashScreenState extends State<SplashScreen>
       _controller.stop();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
+        MaterialPageRoute(
+            builder: (context) => BlocProvider.value(
+                  value: serviceLocator<LoginViewModel>(),
+                  child: LoginPage(),
+                )),
       );
     });
   }
