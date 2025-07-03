@@ -10,13 +10,8 @@ class SignupPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _nameController = TextEditingController();
-
   final TextEditingController _emailController = TextEditingController();
-
-  final TextEditingController _phoneController = TextEditingController();
-
   final TextEditingController _passwordController = TextEditingController();
-
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
@@ -29,14 +24,6 @@ class SignupPage extends StatelessWidget {
     if (value == null || value.isEmpty) return 'Email is required';
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) return 'Enter a valid email';
-    return null;
-  }
-
-  String? _validatePhone(String? value) {
-    if (value == null || value.isEmpty) return 'Phone Number is required';
-    if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
-      return 'Enter a valid 10-digit phone number';
-    }
     return null;
   }
 
@@ -133,12 +120,6 @@ class SignupPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 15),
                     _buildTextFormField(
-                      label: 'Phone Number',
-                      controller: _phoneController,
-                      validator: _validatePhone,
-                    ),
-                    const SizedBox(height: 15),
-                    _buildTextFormField(
                       label: 'Password',
                       controller: _passwordController,
                       obscureText: true,
@@ -146,7 +127,7 @@ class SignupPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 15),
                     _buildTextFormField(
-                      label: 'Confirm password',
+                      label: 'Confirm Password',
                       controller: _confirmPasswordController,
                       obscureText: true,
                       validator: _validateConfirmPassword,
@@ -154,38 +135,32 @@ class SignupPage extends StatelessWidget {
                     const SizedBox(height: 30),
                     SizedBox(
                       width: double.infinity,
-                      child: BlocListener<SignupViewModel, SignupState>(
-                        listener:(context, state) {
-                          if (state.isSuccess) {
-                            context
-                                .read<SignupViewModel>()
-                                .add(NavigateToLoginEvent(context: context));
-                          }
-                        },
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: const BorderSide(color: Colors.white),
-                            ),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: const BorderSide(color: Colors.white),
                           ),
-                          onPressed: () {
+                        ),
+                        onPressed: () {
+                          if (_formKey.currentState?.validate() ?? false) {
                             context.read<SignupViewModel>().add(
-                                RegisterAccountEvent(
+                                  RegisterAccountEvent(
                                     context: context,
                                     email: _emailController.text,
                                     fullName: _nameController.text,
                                     password: _passwordController.text,
-                                    phoneNumber: _phoneController.text));
-                          },
-                          child: const Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                                  ),
+                                );
+                          }
+                        },
+                        child: const Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -200,7 +175,11 @@ class SignupPage extends StatelessWidget {
                             style: TextStyle(color: Colors.white),
                           ),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              context
+                                  .read<SignupViewModel>()
+                                  .add(NavigateToLoginEvent(context: context));
+                            },
                             child: const Text(
                               "Login",
                               style: TextStyle(

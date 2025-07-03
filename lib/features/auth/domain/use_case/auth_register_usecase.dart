@@ -9,24 +9,24 @@ class AuthRegisterParams extends Equatable {
   final String email;
   final String name;
   final String password;
-  final String phoneNumber;
+  final String? role;
 
   const AuthRegisterParams({
-    required this.phoneNumber,
     required this.email,
     required this.name,
     required this.password,
+    this.role,
   });
 
   const AuthRegisterParams.initial({
-    required this.phoneNumber,
     required this.email,
     required this.name,
     required this.password,
+    this.role,
   });
 
   @override
-  List<Object?> get props => [email, name, password, phoneNumber];
+  List<Object?> get props => [email, name, password, role];
 }
 
 class AuthRegisterUsecase
@@ -34,7 +34,7 @@ class AuthRegisterUsecase
   final IAuthRepository _authRepository;
 
   AuthRegisterUsecase({required IAuthRepository authRepository})
-    : _authRepository = authRepository;
+      : _authRepository = authRepository;
 
   @override
   Future<Either<Failure, void>> call(AuthRegisterParams params) {
@@ -42,7 +42,7 @@ class AuthRegisterUsecase
       email: params.email,
       name: params.name,
       password: params.password,
-      phoneNumber: params.phoneNumber,
+      role: params.role ?? 'user',
     );
 
     return _authRepository.createAccount(userEntity);
