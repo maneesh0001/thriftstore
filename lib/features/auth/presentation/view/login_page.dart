@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thrift_store/app/service_locator/service_locator.dart';
 import 'package:thrift_store/features/auth/presentation/view/signup_page.dart';
 import 'package:thrift_store/features/auth/presentation/view_model/login_view_model/login_event.dart';
-import 'package:thrift_store/features/auth/presentation/view_model/login_view_model/login_state.dart';
 import 'package:thrift_store/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:thrift_store/features/auth/presentation/view_model/signup_view_model/signup_view_model.dart';
 
@@ -113,33 +112,26 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(height: 30),
                   SizedBox(
                     width: double.infinity,
-                    child: BlocListener<LoginViewModel, LoginState>(
-                      listener: (context, state) {
-                        if (state.isSuccess) {
-                          context.read<LoginViewModel>().add(NavigateToDashboardEvent(context: context));
-                        }
-                      },
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: const BorderSide(color: Colors.white),
-                          ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: const BorderSide(color: Colors.white),
                         ),
-                        onPressed: () {
-                          context.read<LoginViewModel>().add(LoginSubmitted(
-                              email: _emailController.text,
-                              password: _passwordController.text,
-                              context: context));
-                        },
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      onPressed: () {
+                        context.read<LoginViewModel>().add(LoginSubmitted(
+                            email: _emailController.text,
+                            password: _passwordController.text,
+                            context: context));
+                      },
+                      child: const Text(
+                        "Login",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
