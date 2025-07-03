@@ -30,7 +30,7 @@ class App extends StatelessWidget {
               value: serviceLocator<SignupViewModel>(),
               child: SignupPage(),
             ),
-        '/homeScreen': (context) => DashboardScreen(),
+        '/dashboard': (context) => DashboardScreen(),
       },
       debugShowCheckedModeBanner: false,
       theme: getTheme(),
