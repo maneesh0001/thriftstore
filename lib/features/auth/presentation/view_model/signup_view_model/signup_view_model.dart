@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thrift_store/app/service_locator/service_locator.dart';
+import 'package:thrift_store/core/common/snackbar.dart';
 import 'package:thrift_store/features/auth/presentation/view/login_page.dart';
 import 'package:thrift_store/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 
@@ -17,15 +17,18 @@ class SignupViewModel extends Bloc<SignupEvent, SignupState> {
     on<NavigateToLoginEvent>(_navigateToLogin);
   }
 
-  void _navigateToLogin(NavigateToLoginEvent event, Emitter<SignupState> emit) {
+  void _navigateToLogin(
+      NavigateToLoginEvent event, Emitter<SignupState> emit) {
     if (event.context.mounted) {
       Navigator.pushReplacement(
-          event.context,
-          MaterialPageRoute(
-              builder: (context) => BlocProvider.value(
-                    value: serviceLocator<LoginViewModel>(),
-                    child: LoginPage(),
-                  )));
+        event.context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: serviceLocator<LoginViewModel>(),
+            child: LoginPage(),
+          ),
+        ),
+      );
     }
   }
 
@@ -33,23 +36,22 @@ class SignupViewModel extends Bloc<SignupEvent, SignupState> {
       RegisterAccountEvent event, Emitter<SignupState> emit) async {
     emit(state.copyWith(isLoading: true));
 
-    final data = await _authRegisterUsecase(AuthRegisterParams(
+    final result = await _authRegisterUsecase(AuthRegisterParams(
       email: event.email,
       name: event.fullName,
       password: event.password,
-      phoneNumber: event.phoneNumber,
+      role: event.role,
     ));
 
-    Future.delayed(Duration(seconds: 2));
-
-    data.fold((l) {
-      emit(state.copyWith(isLoading: false, isSuccess: false));
-      ScaffoldMessenger.of(event.context)
-          .showSnackBar(SnackBar(content: Text('Registration failed!')));
-    }, (r) {
-      emit(state.copyWith(isLoading: false, isSuccess: true));
-      ScaffoldMessenger.of(event.context)
-          .showSnackBar(SnackBar(content: Text('Registration successful!')));
-    });
+    result.fold(
+      (failure) {
+        emit(state.copyWith(isLoading: false, isSuccess: false));
+        showMySnackBar(context: event.context, message: "Registeration failed: ${failure.message}",color: Colors.redAccent); 
+      },
+      (success) {
+        emit(state.copyWith(isLoading: false, isSuccess: true));
+        showMySnackBar(context: event.context, message: "Registeration successful");
+      },
+    );
   }
 }
