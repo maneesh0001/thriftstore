@@ -20,4 +20,10 @@ class NavigateToDashboardEvent extends LoginEvent {
   
   NavigateToDashboardEvent({ required this.context });
 }
+
+class NavigateToSignupEvent extends LoginEvent {
+  final BuildContext context;
+
+  NavigateToSignupEvent({ required this.context });
+}
  
