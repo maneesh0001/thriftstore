@@ -1,29 +1,12 @@
-import 'package:flutter/material.dart';
- 
-@immutable
-sealed class LoginEvent {}
- 
+import 'package:flutter/material.dart';//bloc testing
+abstract class LoginEvent {}
 class LoginSubmitted extends LoginEvent {
   final String email;
   final String password;
   final BuildContext context;
- 
   LoginSubmitted({
     required this.email,
     required this.password,
     required this.context
   });
 }
-
-class NavigateToDashboardEvent extends LoginEvent {
-  final BuildContext context;
-  
-  NavigateToDashboardEvent({ required this.context });
-}
-
-class NavigateToSignupEvent extends LoginEvent {
-  final BuildContext context;
-
-  NavigateToSignupEvent({ required this.context });
-}
- 

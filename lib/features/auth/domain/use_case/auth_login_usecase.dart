@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:thrift_store/app/use_case/use_case.dart';
 import 'package:thrift_store/core/error/failure.dart';
-import 'package:thrift_store/features/auth/domain/repository/auth_repository.dart';
+import 'package:thrift_store/features/auth/domain/repository/auth_repository.dart';//unit test
 
  
 class LoginParams extends Equatable {

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';//widget testing
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thrift_store/app/service_locator/service_locator.dart';
 import 'package:thrift_store/features/auth/presentation/view/signup_page.dart';
