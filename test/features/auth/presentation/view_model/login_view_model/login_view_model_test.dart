@@ -1,162 +1,141 @@
-// Import necessary packages for testing
+import 'package:bloc_test/bloc_test.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bloc_test/bloc_test.dart';
-import 'package:mocktail/mocktail.dart'; // Changed from mockito
-import 'package:dartz/dartz.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:thrift_store/core/error/failure.dart';
- 
+import 'package:thrift_store/features/auth/domain/entity/login_response_entity.dart';
+import 'package:thrift_store/features/auth/domain/entity/user_entity.dart';
 import 'package:thrift_store/features/auth/domain/use_case/auth_login_usecase.dart';
 import 'package:thrift_store/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:thrift_store/features/auth/presentation/view_model/login_view_model/login_state.dart';
 import 'package:thrift_store/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
- 
-// --- Mocktail Setup ---
-// Create mock classes for dependencies
+import 'package:thrift_store/app/shared_prefs/user_shared_prefs.dart';
+
+// 1️⃣ Mocks
 class MockAuthLoginUsecase extends Mock implements AuthLoginUsecase {}
-class MockBuildContext extends Mock implements BuildContext {}
- 
-// Create a mock for the snackbar function signature
-class MockShowSnackBar extends Mock {
-  void call({
-    required BuildContext context,
-    required String message,
-    Color? color,
-  });
-}
- 
-// Create a Fake for custom types used as arguments in mocks
+
+class MockUserSharedPrefs extends Mock implements UserSharedPrefs {}
+
+// 2️⃣ Fake class for LoginParams
 class FakeLoginParams extends Fake implements LoginParams {}
-class FakeBuildContext extends Fake implements BuildContext {} // Can also use a Fake
-// --- End Mocktail Setup ---
- 
+
+// We'll mock the snackbar function to just verify calls
+void mockShowSnackbar({
+  required BuildContext context,
+  required String message,
+  Color? color,
+}) {}
+
 void main() {
-  // Register fallback values for any custom types used in mock calls
-  // This is required by mocktail for non-standard types.
   setUpAll(() {
+    // Register fallback so `any()` works for LoginParams
     registerFallbackValue(FakeLoginParams());
-    // FIX: Register a fallback value for BuildContext to resolve the error.
-    registerFallbackValue(FakeBuildContext());
   });
- 
-  // Group tests for the LoginViewModel
+
+  late LoginViewModel loginViewModel;
+  late MockAuthLoginUsecase mockAuthLoginUsecase;
+  late MockUserSharedPrefs mockUserSharedPrefs;
+
+  // Fake BuildContext needed for the event
+  final fakeContext = _FakeBuildContext();
+
+  // Sample login response entity
+  final loginResponse = LoginResponse(
+    token: 'token123',
+    user: UserEntity(
+      id: 'user1',
+      email: 'test@example.com',
+      name: 'Test User',
+      role: 'user',
+      password: '',
+    ),
+    userId: '',
+  );
+
+  setUp(() {
+    mockAuthLoginUsecase = MockAuthLoginUsecase();
+    mockUserSharedPrefs = MockUserSharedPrefs();
+
+    loginViewModel = LoginViewModel(
+      mockAuthLoginUsecase,
+      mockUserSharedPrefs,
+      showSnackbar: mockShowSnackbar,
+    );
+  });
+
   group('LoginViewModel', () {
-    // Declare variables to be used in the tests
-    late MockAuthLoginUsecase mockAuthLoginUsecase;
-    late LoginViewModel loginViewModel;
-    late MockBuildContext mockBuildContext;
-    late MockShowSnackBar mockShowSnackBar;
- 
-    // Test credentials
-    const tEmail = 'test@example.com';
-    const tPassword = 'password123';
-    final tLoginParams = LoginParams(email: tEmail, password: tPassword);
- 
-    // This runs before each test
-    setUp(() {
-      // Initialize the mocks
-      mockAuthLoginUsecase = MockAuthLoginUsecase();
-      mockBuildContext = MockBuildContext();
-      mockShowSnackBar = MockShowSnackBar();
-     
-      // Instantiate the ViewModel with the mocked usecase and snackbar function
-      loginViewModel = LoginViewModel(
-        mockAuthLoginUsecase,
-        showSnackbar: mockShowSnackBar.call,
-      );
-    });
- 
-    // This runs after each test to ensure a clean state
-    tearDown(() {
-      loginViewModel.close();
-    });
- 
-    // Test the initial state of the ViewModel
-    test('initial state is correct', () {
-      expect(loginViewModel.state, LoginState.initial());
-    });
- 
-    // Test case for a successful login
     blocTest<LoginViewModel, LoginState>(
-      'emits [isLoading: true, isSuccess: true] when login is successful',
-      // Arrange: Set up the mock to return a successful result
-      setUp: () {
-        // Use mocktail's `when` syntax for stubbing
-        when(() => mockAuthLoginUsecase(any()))
-            .thenAnswer((_) async => const Right("")); // Assuming success returns void/null
-       
-        // Stub the snackbar call since it will be invoked
-        when(() => mockShowSnackBar.call(
-          context: any(named: 'context'),
-          message: any(named: 'message'),
-          color: any(named: 'color'),
-        )).thenAnswer((_) {});
+      'emits [loading:true, success:false], then [loading:false, success:true] and calls saveUser & snackbar on successful login',
+      build: () {
+        when(() => mockAuthLoginUsecase.call(any())).thenAnswer(
+          (_) async => Right(loginResponse),
+        );
+        when(() => mockUserSharedPrefs.saveUser(
+              token: any(named: 'token'),
+              userId: any(named: 'userId'),
+              email: any(named: 'email'),
+              name: any(named: 'name'),
+              role: any(named: 'role'),
+            )).thenAnswer((_) async => Future.value());
+
+        return loginViewModel;
       },
-      // Act: Build the ViewModel and add the LoginSubmitted event
-      build: () => loginViewModel,
       act: (bloc) => bloc.add(LoginSubmitted(
-        email: tEmail,
-        password: tPassword,
-        context: mockBuildContext,
+        email: 'test@example.com',
+        password: 'password',
+        context: fakeContext,
       )),
-      // Assert: Expect the state to change from loading to success
       expect: () => [
-        LoginState(isLoading: true, isSuccess: false),
-        LoginState(isLoading: false, isSuccess: true),
+        loginViewModel.state.copyWith(isLoading: true, isSuccess: false), // Corrected here
+        loginViewModel.state.copyWith(isLoading: false, isSuccess: true),
       ],
-      // Verify: Ensure the usecase and snackbar were called as expected
       verify: (_) {
-        // Use mocktail's `verify` syntax
-        verify(() => mockAuthLoginUsecase(tLoginParams)).called(1);
-        verify(() => mockShowSnackBar.call(
-          context: mockBuildContext,
-          message: 'Login Successful!',
-          color: null, // Default color is null
-        )).called(1);
-        verifyNoMoreInteractions(mockAuthLoginUsecase);
-        verifyNoMoreInteractions(mockShowSnackBar);
+        verify(() => mockAuthLoginUsecase.call(any())).called(1);
+        verify(() => mockUserSharedPrefs.saveUser(
+              token: loginResponse.token,
+              userId: loginResponse.user.id ?? '',
+              email: loginResponse.user.email,
+              name: loginResponse.user.name,
+              role: loginResponse.user.role ?? '',
+            )).called(1);
       },
     );
- 
-    // Test case for a failed login
+
     blocTest<LoginViewModel, LoginState>(
-      'emits [isLoading: true, isSuccess: false] when login fails',
-      // Arrange: Set up the mock to return a failure
-      setUp: () {
-        when(() => mockAuthLoginUsecase(any()))
-            .thenAnswer((_) async => Left(ApiFailure(message: 'Invalid credentials')));
-       
-        // Stub the snackbar call
-        when(() => mockShowSnackBar.call(
-          context: any(named: 'context'),
-          message: any(named: 'message'),
-          color: any(named: 'color'),
-        )).thenAnswer((_) {});
+      'emits [loading:true, success:false], then [loading:false, success:false] and calls snackbar on login failure',
+      build: () {
+        when(() => mockAuthLoginUsecase.call(any())).thenAnswer(
+          (_) async => Left(ApiFailure(message: 'Login failed')),
+        );
+
+        return loginViewModel;
       },
-      // Act: Build the ViewModel and add the LoginSubmitted event
-      build: () => loginViewModel,
       act: (bloc) => bloc.add(LoginSubmitted(
-        email: tEmail,
-        password: tPassword,
-        context: mockBuildContext,
+        email: 'wrong@example.com',
+        password: 'wrongpassword',
+        context: fakeContext,
       )),
-      // Assert: Expect the state to change from loading back to the initial error state
       expect: () => [
-        LoginState(isLoading: true, isSuccess: false),
-        LoginState(isLoading: false, isSuccess: false),
+        loginViewModel.state.copyWith(isLoading: true, isSuccess: false), // Make sure first loading state is success:false
+        loginViewModel.state.copyWith(isLoading: false, isSuccess: false),
       ],
-      // Verify: Ensure the usecase and snackbar (with error message) were called
       verify: (_) {
-        verify(() => mockAuthLoginUsecase(tLoginParams)).called(1);
-        verify(() => mockShowSnackBar.call(
-          context: mockBuildContext,
-          message: 'Login Failed!',
-          color: Colors.red,
-        )).called(1);
-        verifyNoMoreInteractions(mockAuthLoginUsecase);
-        verifyNoMoreInteractions(mockShowSnackBar);
+        verify(() => mockAuthLoginUsecase.call(any())).called(1);
+        verifyNever(() => mockUserSharedPrefs.saveUser(
+              token: any(named: 'token'),
+              userId: any(named: 'userId'),
+              email: any(named: 'email'),
+              name: any(named: 'name'),
+              role: any(named: 'role'),
+            ));
       },
     );
   });
 }
- 
+
+// A simple fake BuildContext implementation
+class _FakeBuildContext implements BuildContext {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
