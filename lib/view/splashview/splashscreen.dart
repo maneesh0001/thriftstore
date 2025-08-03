@@ -55,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen>
         context,
         MaterialPageRoute(
             builder: (context) => BlocProvider.value(
-                  value: serviceLocator<LoginViewModel>(),
+                  value: getIt<LoginViewModel>(),
                   child: LoginPage(),
                 )),
       );
