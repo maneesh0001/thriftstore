@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:thrift_store/app/service_locator/service_locator.dart';
+import 'package:thrift_store/features/auth/presentation/view/login_page.dart';
+import 'package:thrift_store/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:thrift_store/features/auth/presentation/view_model/signup_view_model/signup_event.dart';
-// import 'package:thrift_store/features/auth/presentation/view_model/signup_view_model/signup_state.dart';
 import 'package:thrift_store/features/auth/presentation/view_model/signup_view_model/signup_view_model.dart';
 
 class SignupPage extends StatelessWidget {
@@ -176,8 +178,15 @@ class SignupPage extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
-                              
-                                  
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BlocProvider.value(
+                                    value: getIt<LoginViewModel>(),
+                                    child: LoginPage(),
+                                  ),
+                                ),
+                              );
                             },
                             child: const Text(
                               "Login",
